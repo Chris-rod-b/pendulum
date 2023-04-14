@@ -1,10 +1,50 @@
+use speedy2d::color::Color;
+use speedy2d::window::{WindowHandler, WindowHelper};
+use speedy2d::{Graphics2D, Window};
+
 mod vector; 
 use vector::Vector;
 
 fn main() {
-    println!("Hello, world!");
+    //We nee this window object to create a window
+    let window = Window::new_centered("Pendulum", (1200, 700)).unwrap();
+
+    let win = MyWindowHandler {
+        p: Pendulum::new(600.0, 0.0, 200.0),
+        p2: Pendulum::new(600.0, 0.0, 400.0),
+        p3: Pendulum::new(600.0, 0.0, 600.0)
+    };
+
+    //Run the Loop
+    window.run_loop(win);
 }
 
+struct MyWindowHandler {
+    p: Pendulum,
+    p2: Pendulum,
+    p3: Pendulum,
+}
+
+impl WindowHandler for MyWindowHandler {
+    fn on_draw(&mut self, helper: &mut WindowHelper<()>, graphics: &mut Graphics2D) {
+        //We need to clear the screen every frame time
+        graphics.clear_screen(Color::from_rgb(0.8, 0.9, 1.0));
+
+        self.p.update();
+        self.p.draw(graphics, Color::MAGENTA);
+
+        self.p2.update();
+        self.p2.draw(graphics, Color::YELLOW);
+
+        self.p3.update();
+        self.p3.draw(graphics, Color::RED);
+
+        //Draw the frame!!
+        helper.request_redraw();
+    }
+}
+
+#[allow(dead_code)]
 struct Pendulum {
     //This vector is the position of the pendulum
     origin: Vector,
@@ -54,7 +94,23 @@ impl Pendulum {
 
     }
 
-    fn draw() {
+    fn draw(&self, graphics: &mut Graphics2D, color: Color) {
+        //We need to drae the line of the pendulum first
+        //Them, it takes the start and end position, the width and the color of the line
+        graphics.draw_line(
+            (self.origin.x, self.origin.y), 
+            (self.position.x, self.position.y), 
+            3.0, 
+            color,
+        );
 
+        //We need to draw the ball of the pendulum
+        //It takes the position, the radius and the color of the ball
+        graphics.draw_circle(
+            (self.position.x, self.position.y), 
+            30.0, 
+            color,
+        ); 
     }
+
 }
